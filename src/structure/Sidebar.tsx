@@ -1,15 +1,40 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 
-export default class Sidebar extends React.Component {
+interface SidebarProps {
+  className: string;
+};
+interface SidebarState { };
+
+export default class Sidebar extends React.Component<SidebarProps, SidebarState> {
   render() {
     return (
-      <nav className="w-1/6 h-screen bg-gray-800">
+      <nav className={this.props.className}>
         <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/dashboard">Dashboard</Link></li>
+          <SidebarLink icon='' to='/'>Home</SidebarLink>
+          <SidebarLink icon='' to='/dashboard'>Dashboard</SidebarLink>
         </ul>
       </nav>
     );
+  }
+}
+
+interface SidebarLinkProps {
+  to: string;
+  icon: string;
+};
+
+interface SidebarLinkState {};
+
+class SidebarLink extends React.Component<SidebarLinkProps, SidebarLinkState> {
+  render() {
+    return (
+      <li className="
+        w-full text-xl flex justify-around content-center align-center text-white py-5
+        hover:bg-gray-600 focus:bg-blue-600
+      ">
+        <Link to={this.props.to}>{this.props.children}</Link>
+      </li>
+    )
   }
 }

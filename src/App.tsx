@@ -10,9 +10,9 @@ function App() {
         <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
         <UserIcon />
       </header>
-      <div id="body">
-        <Sidebar />
-        <div className="w-5/6 h-screen">
+      <div id="body" className="h-screen w-screen">
+        <Sidebar className="w-1/6 h-full bg-gray-800 inline-block" />
+        <div className="w-5/6 h-full inline-block">
           <Switch>
             <Route path="/">
               Default Route
