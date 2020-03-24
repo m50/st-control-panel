@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
   className: string;
@@ -11,8 +11,11 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
     return (
       <nav className={this.props.className}>
         <ul>
-          <SidebarLink icon='' to='/'>Home</SidebarLink>
           <SidebarLink icon='' to='/dashboard'>Dashboard</SidebarLink>
+          <SidebarLink icon='' to='/system'>System</SidebarLink>
+          <SidebarLink icon='' to='/domains'>Domains</SidebarLink>
+          <SidebarLink icon='' to='/domain-groups'>Domain Groups</SidebarLink>
+          <SidebarLink icon='' to='/reporting'>Reporting</SidebarLink>
         </ul>
       </nav>
     );
@@ -22,19 +25,16 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
 interface SidebarLinkProps {
   to: string;
   icon: string;
+  children: string;
 };
-
-interface SidebarLinkState {};
-
-class SidebarLink extends React.Component<SidebarLinkProps, SidebarLinkState> {
-  render() {
-    return (
-      <li className="
-        w-full text-xl flex justify-around content-center align-center text-white py-5
-        hover:bg-gray-600 focus:bg-blue-600
-      ">
-        <Link to={this.props.to}>{this.props.children}</Link>
-      </li>
-    )
-  }
+const SidebarLink: React.FunctionComponent<SidebarLinkProps> = (props) => {
+  return (
+    <li>
+      <NavLink className="
+            w-full text-xl flex justify-around content-center align-center text-white py-5
+            hover:bg-gray-600 focus:bg-blue-600
+          "
+        activeClassName="border-l-2 border-orange-400 bg-gray-800" to={props.to}>{props.children}</NavLink>
+    </li>
+  );
 }
