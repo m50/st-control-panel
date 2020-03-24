@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import Sidebar from './structure/Sidebar'
-import UserIcon from './structure/UserIcon';
+import Sidebar from './components/structure/Sidebar'
+import UserIcon from './components/structure/UserIcon';
 
 export default () => {
   return (
