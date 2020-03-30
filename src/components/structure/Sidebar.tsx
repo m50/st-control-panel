@@ -1,21 +1,31 @@
 import React from 'react';
 import { NavLink } from "react-router-dom";
+import { LinkData } from "../../types";
 
-interface SidebarProps {
-  className: string;
-};
-interface SidebarState { };
+interface SidebarProps { };
 
-export default class Sidebar extends React.Component<SidebarProps, SidebarState> {
+export default class Sidebar extends React.Component<SidebarProps, {}> {
+  linkData: LinkData[]
+
+  constructor(props: SidebarProps) {
+    super(props);
+    this.linkData = [
+      {to: '/dashboard', icon: '', title: 'Dashboard'},
+      {to: '/system', icon: '', title: 'System'},
+      {to: '/domains', icon: '', title: 'Domains'},
+      {to: '/domain-groups', icon: '', title: 'Domain Groups'},
+      {to: '/reporting', icon: '', title: 'Reporting'},
+      {to: '/quarantine', icon: '', title: 'Quarantine'},
+      {to: '/history', icon: '', title: 'History'},
+    ];
+  }
   render() {
     return (
-      <nav className={this.props.className}>
+      <nav className="
+        pt-20 w-auto h-full bg-gray-700 inline-block
+      ">
         <ul>
-          <SidebarLink icon='' to='/dashboard'>Dashboard</SidebarLink>
-          <SidebarLink icon='' to='/system'>System</SidebarLink>
-          <SidebarLink icon='' to='/domains'>Domains</SidebarLink>
-          <SidebarLink icon='' to='/domain-groups'>Domain Groups</SidebarLink>
-          <SidebarLink icon='' to='/reporting'>Reporting</SidebarLink>
+          {this.linkData.map((link, index) => <SidebarLink key={index} icon={link.icon} to={link.to}>{link.title}</SidebarLink>)}
         </ul>
       </nav>
     );
@@ -31,10 +41,13 @@ const SidebarLink: React.FunctionComponent<SidebarLinkProps> = (props) => {
   return (
     <li>
       <NavLink className="
-            w-full text-xl flex justify-around content-center align-center text-white py-5
-            hover:bg-gray-600 focus:bg-blue-600
+            w-full text-xl flex justify-left content-center align-center text-white py-5
+            hover:bg-gray-600 focus:bg-blue-600 px-5
           "
-        activeClassName="border-l-2 border-orange-400 bg-gray-800" to={props.to}>{props.children}</NavLink>
+        activeClassName="border-l-2 border-orange-400 bg-gray-800" to={props.to}
+      >
+        {props.children}
+      </NavLink>
     </li>
   );
 }
