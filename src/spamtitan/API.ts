@@ -1,13 +1,7 @@
 import { AuthKey } from "../types";
 import { User } from "./User";
-
-export interface ResponseObject<RespType> {
-  objectType: string,
-  code: number,
-  object: RespType,
-}
-
-type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+import { Token } from "./Token";
+import { BodyParameters, BaseResponseObject, RequestMethod, DataResponseObject, ListResponseObject, ErrorResponse, RootObject } from "./requestTypes";
 
 export default class SpamTitanAPI {
   private authKeys: AuthKey[] = [];
@@ -18,11 +12,16 @@ export default class SpamTitanAPI {
     this.servers = servers;
   }
 
-  auth = (email: string, password: string): User | false => {
+  auth = async (email: string, password: string): Promise<User | false> => {
     this.servers.forEach(async (server: string) => {
       server = server.replace(/\/$/, '');
-      const response = await this.makeRequest('POST', `${server}/restapi/auth/tokens`, { email: email, password: password });
-      if (response.code === 201) {
+      const response: BaseResponseObject<Token> = await this.makeRequest<Token>('POST', `${server}/restapi/auth/tokens`, {
+        email: email,
+        password: password,
+        validation_errors: true,
+      });
+
+      if (responseIsDataObject(response) && response.code === 201) {
         this.authKeys.push({
           spamtitan: server,
           key: response.object.access_token,
@@ -37,7 +36,13 @@ export default class SpamTitanAPI {
       return false;
     }
 
-    this.query('GET', `/users/${email}`)
+    const userResponse: BaseResponseObject<User> = await this.query<User>('GET', `/users/${email}`);
+
+    if (responseIsDataObject(userResponse)) {
+      return userResponse.object;
+    }
+
+    this.logout();
 
     return false;
   }
@@ -56,8 +61,13 @@ export default class SpamTitanAPI {
     return success;
   }
 
-  query = async <RespType>(method: RequestMethod, endPoint: string, body?: object): Promise<ResponseObject<RespType>> => {
+  query = async <RespType>(
+    method: RequestMethod,
+    endPoint: string,
+    body?: BodyParameters
+  ): Promise<BaseResponseObject<RespType>> => {
     const authKey: AuthKey = this.authKeys[Math.random() * this.authKeys.length];
+    body = body ?? {};
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
@@ -65,10 +75,16 @@ export default class SpamTitanAPI {
       Authorization: `Beader ${authKey.key}`,
     };
 
+    body.validation_errors = true;
+
     return this.makeRequest(method, `${authKey.spamtitan}/restapi/${endPoint}`, body, headers);
   }
 
-  private makeRequest = async <RespType>(method: RequestMethod, url: string, body?: object, headers?: Record<string, string>): Promise<ResponseObject<RespType>> => {
+  private makeRequest = async <RespType>(
+    method: RequestMethod,
+    url: string, body?: BodyParameters,
+    headers?: Record<string, string>
+  ): Promise<BaseResponseObject<RespType>> => {
     const response = await fetch(url, {
       method: method,
       body: JSON.stringify(body ?? {}),
@@ -81,12 +97,48 @@ export default class SpamTitanAPI {
     const json = await response.json();
 
     const { object, code, ...rest } = json;
-    const responseObject: ResponseObject<RespType> = {
-      objectType: object,
+
+    if (object === 'list') {
+      const { count, total, data } = rest;
+      const responseObject: ListResponseObject<RespType> = {
+        objectType: object,
+        code: code,
+        total: total,
+        count: count,
+        data: data
+      }
+
+      return responseObject;
+    }
+
+    if (object) {
+      const responseObject: DataResponseObject<RespType> = {
+        objectType: object,
+        code: code,
+        object: rest,
+      };
+
+      return responseObject;
+    }
+
+    const { error } = rest;
+    const responseObject: ErrorResponse = {
       code: code,
-      object: rest,
+      error: error,
     };
 
     return responseObject;
   }
+}
+
+export function responseIsList<T>(response: BaseResponseObject<T>): response is ListResponseObject<T> {
+  return response?.objectType === 'list';
+}
+
+export function responseIsDataObject<T>(response: BaseResponseObject<T>): response is DataResponseObject<T> {
+  return (response as DataResponseObject<T>).object !== undefined;
+}
+
+export function responseIsError(response: BaseResponseObject<RootObject>): response is ErrorResponse {
+  return (response as ErrorResponse).error !== undefined;
 }

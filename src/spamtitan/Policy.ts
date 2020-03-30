@@ -1,6 +1,8 @@
+import { RootObject } from "./requestTypes";
+
 export type Action = 'quarantine' | 'reject' | 'passtag'
 
-export interface Policy {
+export interface Policy extends RootObject {
   id: number,
   policy_name: string,
   banned_subject_tag: string,
