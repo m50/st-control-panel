@@ -1,14 +1,11 @@
 import React, { ChangeEvent, FormEvent } from 'react';
-import { AuthStatus } from '../../types';
+import { AuthStatus, AuthStatusProps } from '../../types';
 import { Redirect } from 'react-router';
 import { initAuthStatus } from '../../App';
 import config from '../../configuration.json';
 
 // The types to use in this file.
-interface Props { // The props for the LoginPage component.
-  authStatus: AuthStatus,
-  setAuthStatus: CallableFunction,
-}
+interface Props extends AuthStatusProps { } // The props for the LoginPage component.
 interface FormProps extends Props { } // Props for the login form; same as LoginPage for now.
 interface FormState { // State for the login form;
   email: string,

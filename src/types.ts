@@ -15,3 +15,8 @@ export interface AuthStatus {
     keys: AuthKey[],
     user: object,
 }
+
+export interface AuthStatusProps {
+    authStatus: AuthStatus,
+    setAuthStatus: CallableFunction,
+}

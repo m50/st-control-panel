@@ -1,10 +1,7 @@
 import React from 'react';
-import { AuthStatus } from '../../types';
+import { AuthStatusProps } from '../../types';
 
-interface Props {
-  authStatus: AuthStatus,
-  setAuthStatus: CallableFunction,
-}
+interface Props extends AuthStatusProps { }
 
 export default class UserIcon extends React.Component<Props> {
   render() {
