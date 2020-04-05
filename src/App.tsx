@@ -13,6 +13,8 @@ export const initAuthStatus: AuthStatus = {
   user: {},
 }
 
+let logoutTimer: NodeJS.Timeout;
+
 export default () => {
   const [authStatus, setAuthStatus] = useState(
     JSON.parse(localStorage.getItem('authStatus') ?? JSON.stringify(initAuthStatus))
@@ -25,9 +27,20 @@ export default () => {
 
   const authStatusComponents = { authStatus: authStatus, setAuthStatus: setAuth };
 
+  const setLogoutTimer = () => {
+    logoutTimer = setTimeout(
+      () => setAuth(initAuthStatus),
+      config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */
+    )
+  };
+
   if (authStatus.loggedIn) {
-    setTimeout(() => setAuth(initAuthStatus), config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */);
+    setLogoutTimer();
   }
+  window.addEventListener('mouseup', () => {
+    clearTimeout(logoutTimer);
+    setLogoutTimer();
+  });
   return (
     <Router>
       <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
