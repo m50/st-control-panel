@@ -28,7 +28,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:tsc": "tsc -p tsconfig.test.json -w",
-    "build:css": "npx tailwindcss build src/tailwind.css -o src/main.css"
+    "build:css": "npx tailwindcss build src/tailwind.css -o src/index.css"
   },
   "eslintConfig": {
     "extends": "react-app"
