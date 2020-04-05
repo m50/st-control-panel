@@ -1,6 +1,6 @@
 export interface LinkData {
     to: string,
-    icon: string,
+    icon: string | React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string | undefined; }>,
     title: string,
 }
 
