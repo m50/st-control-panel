@@ -8,6 +8,7 @@ import { ReactComponent as domainGroupIcon } from "../zondicons/cloud.svg";
 import { ReactComponent as reportingIcon } from "../zondicons/news-paper.svg";
 import { ReactComponent as quarantineIcon } from "../zondicons/shield.svg";
 import { ReactComponent as historyIcon } from "../zondicons/inbox-full.svg";
+import { ReactComponent as userIcon } from "../zondicons/user.svg";
 
 interface SidebarProps { }
 interface SidebarState {
@@ -23,6 +24,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
     {to: '/dashboard', icon: dashboardIcon, title: 'Dashboard'},
     {to: '/system', icon: systemIcon, title: 'System'},
     {to: '/domains', icon: domainIcon, title: 'Domains'},
+    {to: '/users', icon: userIcon, title: 'Users'},
     {to: '/domain-groups', icon: domainGroupIcon, title: 'Domain Groups'},
     {to: '/reporting', icon: reportingIcon, title: 'Reporting'},
     {to: '/quarantine', icon: quarantineIcon, title: 'Quarantine'},
