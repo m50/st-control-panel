@@ -29,7 +29,7 @@ export default () => {
   }
   return (
     <Router>
-      <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white">
+      <header className="w-screen fixed left-0 top-0 lg:z-50 bg-orange-500 flex items-center justify-between text-white">
         <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
         <UserIcon {...authStatusComponents} />
       </header>
