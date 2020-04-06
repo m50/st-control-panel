@@ -19,7 +19,7 @@ export const Section: React.FunctionComponent<Props> = (props: Props) => {
   const [height, setHeight] = useState<number | string>(defaultExpanded ? 'auto' : 0);
 
   const toggleExpand = () => {
-    setHeight(height === 0 ? 'auto' : 0);
+    setHeight(h => h === 0 ? 'auto' : 0);
   }
 
   const Cheveron = height === 'auto' ? CheveronUp : CheveronDown;
