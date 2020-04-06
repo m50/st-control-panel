@@ -24,11 +24,14 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
+    "prep": "cp src/configuration.example.json src/configuration.json",
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "dev": "npm run build:css && react-scripts start",
     "eject": "react-scripts eject",
+    "test:react": "react-scripts test",
     "test:tsc": "tsc -p tsconfig.test.json -w",
+    "build": "npm run build:css && npm run build:react",
+    "build:react": "react-scripts build",
     "build:css": "npx tailwindcss build src/tailwind.css -o src/index.css"
   },
   "eslintConfig": {
