@@ -79,9 +79,9 @@ const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = (props: BodyWrapp
     return <Redirect to="/login" />;
   }
   return (
-    <div id="body" className="z-0 fixed top-0 left-0 h-screen w-screen flex">
+    <div id="body" className="z-0fixed top-0 left-0 h-screen w-screen flex">
       <Sidebar />
-      <div className="pt-14 w-11/12 h-full w-screen inline-block">
+      <div className="pt-14 h-full sm:w-11/12 max-w-screen inline-block">
         {props.children}
       </div>
     </div>

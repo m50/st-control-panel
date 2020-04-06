@@ -34,7 +34,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
   className: string = `
     h-full bg-gray-700 w-screen flex-col justify-between pt-0 fixed left-0 top-0 pt-14
     transform transition-transform duration-300 ease-in-out
-    sm:z-0 flex md:translate-x-0
+    sm:z-0 flex md:translate-x-0 sm:relative
   `
 
   shrunkenClassName: string = `
@@ -68,7 +68,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
       className={`
         fixed left-0 bottom-0 py-2 px-1 w-12
         text-3xl md:text-white border-gray-400 outline-none bg-transparent truncate overflow-x-hidden text-orange-400 font-bold
-        sm:relative sm:bottom-auto sm:left-auto sm:text-lg md:text-lg sm:w-full sm:border-t sm:font-medium sm:relative
+        sm:relative sm:bottom-auto sm:left-auto sm:text-lg md:text-lg sm:w-full sm:border-t sm:font-medium
         focus:outline-none focus:text-blue-600 sm:hover:bg-gray-800
       ` + props.className}
       onClick={this.expandSidebar}
