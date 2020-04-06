@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import Sidebar from './components/structure/Sidebar'
-import UserIcon from './components/structure/UserIcon';
+import { UserDropdown } from './components/structure/UserIcon';
 import LoginPage from './components/pages/Login';
 import { AuthStatus } from './types';
 import config from './configuration.json';
@@ -45,7 +45,7 @@ export default () => {
     <Router>
       <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
         <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
-        <UserIcon {...authStatusComponents} />
+        <UserDropdown {...authStatusComponents} />
       </header>
       <Switch>
         <Route path="/login">
