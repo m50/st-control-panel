@@ -24,7 +24,7 @@ export const Section: React.FunctionComponent<Props> = (props: Props) => {
 
   const Cheveron = height === 'auto' ? CheveronUp : CheveronDown;
   return (
-    <section className="text-gray-900 border-b border-gray-400 py-5">
+    <section className="text-gray-900 border-b border-gray-300 py-5">
       <div className="flex justify-between mb-6 content-center">
         <span className="w-3/4">
           <h2 className="font-bold text-2xl">{props.title}</h2>

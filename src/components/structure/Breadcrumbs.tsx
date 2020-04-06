@@ -29,7 +29,7 @@ export default class Breadcrumbs extends React.Component<Props> {
 
   render() {
     return (
-      <div className="px-2">
+      <div className="my-3 px-2">
         <div className="bg-gray-200 rounded-lg w-full py-1 px-8">
           {React.Children.map(this.props.children, (child, i) => {
             if (i > 0) {
