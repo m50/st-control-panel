@@ -3,6 +3,7 @@ import { AuthStatusProps } from '../../types';
 import { ReactComponent as UserIcon } from '../zondicons/user-solid-circle.svg';
 import { ReactComponent as LogoutIcon } from '../zondicons/travel-walk.svg';
 import { initAuthStatus } from '../../App';
+import { User } from '../../spamtitan/User';
 
 interface Props extends AuthStatusProps { }
 
@@ -36,6 +37,13 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
 
   const logout = () => props.setAuthStatus(initAuthStatus);
 
+  let initials = (props.authStatus.user as User).first_name.substr(0, 1).toUpperCase() +
+    (props.authStatus.user as User).last_name.substr(0, 1).toUpperCase();
+
+  if (initials.length === 0) {
+    initials = (props.authStatus.user as User).email.substr(0, 2).toUpperCase();
+  }
+
   return (
     <>
       <button
@@ -43,7 +51,7 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
         onClick={togglePopUp}
         className="bg-white my-2 mx-5 rounded-full w-10 h-10 leading-10 text-black text-center align-middle text-xl"
       >
-        MC
+        {initials}
       </button>
       <div ref={dropDownRef}
         className={`
@@ -52,7 +60,7 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
           ` + (popUpVisible ? 'block' : 'hidden')
         }
       >
-        <a href={"/users/"} className="text-lg py-2 hover:text-orange-500 hover:underline border-b border-gray-400">
+        <a href={`/users/${(props.authStatus.user as User).id}`} className="text-lg py-2 hover:text-orange-500 hover:underline border-b border-gray-400">
           <UserIcon className="fill-current w-5 h-5 inline mr-4" />
           User Profile
         </a>
