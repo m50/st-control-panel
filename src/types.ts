@@ -1,3 +1,5 @@
+import { User } from "./spamtitan/User";
+
 export interface LinkData {
     to: string,
     icon: string | React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string | undefined; }>,
@@ -13,7 +15,7 @@ export interface AuthKey {
 export interface AuthStatus {
     loggedIn: boolean,
     keys: AuthKey[],
-    user: object,
+    user: User | {},
 }
 
 export interface AuthStatusProps {
