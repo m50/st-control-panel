@@ -2,6 +2,7 @@ import { AuthKey } from "../types";
 import { User } from "./User";
 import { Token } from "./Token";
 import { BodyParameters, BaseResponseObject, RequestMethod, DataResponseObject, ListResponseObject, ErrorResponse, RootObject } from "./requestTypes";
+import { isNull } from "util";
 
 export default class SpamTitanAPI {
   private authKeys: AuthKey[] = [];
@@ -12,51 +13,91 @@ export default class SpamTitanAPI {
     this.servers = servers;
   }
 
-  auth = async (email: string, password: string): Promise<User | false> => {
-    this.servers.forEach(async (server: string) => {
-      server = server.replace(/\/$/, '');
-      const response: BaseResponseObject<Token> = await this.makeRequest<Token>('POST', `${server}/restapi/auth/tokens`, {
-        email: email,
-        password: password,
-        validation_errors: true,
-      });
+  getKeys = (): AuthKey[] => {
+    return this.authKeys;
+  }
 
-      if (responseIsDataObject(response) && response.code === 201) {
-        this.authKeys.push({
-          spamtitan: server,
-          key: response.object.access_token,
-          keyId: response.object.id,
+  auth = async (email: string, password: string): Promise<User> => {
+    this.authKeys = [];
+    const responses = await Promise.all(this.servers.map((server: string) => {
+        server = server.replace(/\/$/, '');
+        return this.makeRequest<Token>('POST', `${server}/restapi/auth/tokens`, {
+          username: email,
+          password: password,
+          validation_errors: true,
+          expires: true,
+          expiration_date: new Date(Date.now() + 1000 /*sec*/ * 60 /*min*/ * 60 /*hour*/ * 24 /*day*/),
+        }).then((response) => {
+          return {
+            spamtitan: server,
+            response: response,
+          }
         });
+      }));
+
+    let userId: number = 0;
+
+    responses.forEach((data: {spamtitan: string, response: BaseResponseObject<Token>}) => {
+      if (responseIsDataObject(data.response) && data.response.code === 201) {
+        this.authKeys.push({
+          spamtitan: data.spamtitan,
+          key: (data.response as DataResponseObject<Token>).object.access_token,
+          keyId: (data.response as DataResponseObject<Token>).object.token_id,
+        });
+        userId = (data.response as DataResponseObject<Token>).object.user_id;
+      } else {
+        throw data.response;
       }
-    });
+    })
 
     if (this.authKeys.length !== this.servers.length) {
       this.logout();
 
-      return false;
+      const newError: ErrorResponse = {
+        error: 'Unable to log into all machines in cluster.',
+        code: 500,
+      }
+      throw newError;
     }
 
-    const userResponse: BaseResponseObject<User> = await this.query<User>('GET', `/users/${email}`);
+    const userResponse: BaseResponseObject<User> = await this.query<User>('GET', `/users/${userId}`);
 
     if (responseIsDataObject(userResponse)) {
       return userResponse.object;
     }
 
-    this.logout();
+    if (responseIsError(userResponse)) {
+      throw userResponse
+    }
 
-    return false;
+    const newError: ErrorResponse = {
+      error: `An unknown error has occured. (${userResponse.code})`,
+      code: userResponse.code,
+    }
+    throw newError;
   }
 
-  logout = (): boolean => {
+  logout = async (): Promise<boolean> => {
     let success = true;
-    this.authKeys.forEach(async (authKey: AuthKey) => {
-      const response = await this.makeRequest('DELETE', `${authKey.spamtitan}/restapi/auth/tokens/${authKey.keyId}`);
-      if (response.code === 200) {
-        this.authKeys = this.authKeys.filter((key: AuthKey): boolean => authKey.key === key.key && authKey.spamtitan === key.spamtitan );
+    const responses = await Promise.all(this.authKeys.map((authKey: AuthKey): null | Promise<{response: BaseResponseObject<RootObject>, authKey: AuthKey}> => {
+      if (authKey.keyId) {
+        return this.query<RootObject>('DELETE', `auth/tokens/${authKey.keyId}`)
+          .then((response) => { return { response: response, authKey: authKey }; });
+      }
+
+      return null;
+    }));
+
+    responses.forEach((data: { response: BaseResponseObject<RootObject>, authKey: AuthKey } | null) => {
+      if (isNull(data)) {
+        return;
+      }
+      if (data.response.code === 200) {
+        this.authKeys = this.authKeys.filter((key: AuthKey): boolean => data.authKey.key === key.key && data.authKey.spamtitan === key.spamtitan);
       } else {
         success = false;
       }
-    });
+    })
 
     return success;
   }
@@ -66,37 +107,38 @@ export default class SpamTitanAPI {
     endPoint: string,
     body?: BodyParameters
   ): Promise<BaseResponseObject<RespType>> => {
-    const authKey: AuthKey = this.authKeys[Math.random() * this.authKeys.length];
+    const authKey: AuthKey = this.authKeys[Math.round(Math.random() * this.authKeys.length)];
     body = body ?? {};
 
     const headers: Record<string, string> = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Beader ${authKey.key}`,
+      Authorization: `Bearer ${authKey.key}`,
     };
 
     body.validation_errors = true;
 
-    return this.makeRequest(method, `${authKey.spamtitan}/restapi/${endPoint}`, body, headers);
+    return this.makeRequest<RespType>(method, `${authKey.spamtitan}/restapi/${endPoint.replace(/^\/|\/$/g, '')}`, body, headers);
   }
 
   private makeRequest = async <RespType>(
     method: RequestMethod,
-    url: string, body?: BodyParameters,
+    url: string,
+    body?: BodyParameters,
     headers?: Record<string, string>
   ): Promise<BaseResponseObject<RespType>> => {
-    const response = await fetch(url, {
+    let h = headers ?? {};
+    h['Content-Type'] = 'application/json';
+    h['Accept'] = 'application/json';
+    let config: RequestInit = {
       method: method,
-      body: JSON.stringify(body ?? {}),
-      headers: headers ?? {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
+      headers: h,
+    };
+    if (method !== 'GET') {
+      config.body = JSON.stringify(body);
+    }
+    const response = await fetch(url, config)
+      .then((resp) => resp.json());
 
-    const json = await response.json();
-
-    const { object, code, ...rest } = json;
+    const { object, code, ...rest } = response;
 
     if (object === 'list') {
       const { count, total, data } = rest;

@@ -21,7 +21,7 @@ export interface ListResponseObject<RespType extends RootObject> extends BaseRes
 }
 
 export interface ErrorResponse extends BaseResponseObject<RootObject> {
-  error: string | object[],
+  error: any,
 }
 
 export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';

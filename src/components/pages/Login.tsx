@@ -1,8 +1,13 @@
 import React, { ChangeEvent, FormEvent } from 'react';
 import { AuthStatus, AuthStatusProps } from '../../types';
 import { Redirect } from 'react-router';
-import { initAuthStatus } from '../../App';
+import { api, initAuthStatus } from '../../App';
 import config from '../../configuration.json';
+import { ErrorResponse } from '../../spamtitan/requestTypes';
+import { User } from '../../spamtitan/User';
+import TextInput from '../structure/pre-styled/TextInput';
+import Label from '../structure/pre-styled/Label';
+import { ReactComponent as ErrorIcon } from '../zondicons/close-solid.svg';
 
 // The types to use in this file.
 interface Props extends AuthStatusProps { } // The props for the LoginPage component.
@@ -10,6 +15,7 @@ interface FormProps extends Props { } // Props for the login form; same as Login
 interface FormState { // State for the login form;
   email: string,
   password: string,
+  errors: string[],
 }
 
 class LoginForm extends React.Component<FormProps, FormState> {
@@ -18,18 +24,36 @@ class LoginForm extends React.Component<FormProps, FormState> {
     this.state = {
       email: '',
       password: '',
+      errors: [],
     };
   }
 
   handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const authStatus: AuthStatus = {
-      loggedIn: true,
-      keys: [],
-      user: {},
-    };
-    setTimeout(() => this.props.setAuthStatus(initAuthStatus), config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */);
-    this.props.setAuthStatus(authStatus);
+    api.auth(this.state.email, this.state.password)
+      .then((user: User) => {
+        const authStatus: AuthStatus = {
+          loggedIn: true,
+          keys: api.getKeys(),
+          user: user,
+        };
+        setTimeout(() => this.props.setAuthStatus(initAuthStatus), config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */);
+        this.props.setAuthStatus(authStatus);
+      })
+      .catch((data: ErrorResponse) => {
+        if ((data as ErrorResponse).error) {
+          const error = (data as ErrorResponse).error;
+          try {
+            const errors = JSON.parse(error);
+
+            console.log(errors);
+            return;
+          } catch (e) {
+            this.setState({ errors: [error] });
+            return;
+          }
+        }
+      });
   }
 
   handleEmailInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -50,28 +74,27 @@ class LoginForm extends React.Component<FormProps, FormState> {
           Login:
         </h2>
         <div className="h-full sm:h-auto flex flex-col justify-center sm:justify-between px-10 py-5">
-          <label className="my-2">
-            Email: <br />
-            <input name="email"
-              className="my-2 mx-1 px-2 py-1 w-full
-                border-2 border-gray-400 rounded
-                focus:border-orange-400 focus:outline-none"
-              value={this.state.email}
-              onChange={this.handleEmailInput} />
-          </label>
-          <label className="my-2">
-            Password: <br />
-            <input type="password"
-              className="my-2 mx-1 px-2 py-1 w-full
-                border-2 border-gray-400 rounded
-                focus:border-orange-400 focus:outline-none"
-              name="password"
-              value={this.state.password}
-              onChange={this.handlePasswordInput} />
-          </label>
+          <div className="py-2">
+            <Label>Email</Label>
+            <TextInput value={this.state.email} onchangeEvent={this.handleEmailInput} />
+          </div>
+          <div className="py-2">
+            <Label>Password</Label>
+            <TextInput value={this.state.password} type="password" onchangeEvent={this.handlePasswordInput} />
+          </div>
           <input type="submit"
             className="text-white bg-orange-400 mt-8 py-2 px-4 rounded hover:bg-orange-500"
             value="Login" />
+          <small className={
+            "p-2 text-red-600 text-sm mt-5 bg-red-100 border border-red-300 rounded " +
+            (this.state.errors.length > 0 ? 'block' : 'hidden')
+          }>
+            <ul className="">
+              {this.state.errors.map((error, i) => {
+                return <li key={i}><ErrorIcon className="fill-current w-3 h-3 inline-block" /> {error}</li>;
+              })}
+            </ul>
+          </small>
         </div>
       </form>
     );

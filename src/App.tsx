@@ -6,6 +6,9 @@ import LoginPage from './components/pages/Login';
 import { AuthStatus } from './types';
 import config from './configuration.json';
 import System from './components/pages/System';
+import SpamTitanAPI from './spamtitan/API';
+
+export const api = new SpamTitanAPI([], config.spamtitanInstances);
 
 export const initAuthStatus: AuthStatus = {
   keys: [],
@@ -21,8 +24,15 @@ export default () => {
   );
 
   const setAuth: CallableFunction = (as: AuthStatus) => {
-    setAuthStatus(as);
-    localStorage.setItem('authStatus', JSON.stringify(as));
+    if (!as.loggedIn) {
+      api.logout().then(() => {
+        setAuthStatus(as);
+        localStorage.setItem('authStatus', JSON.stringify(as));
+      });
+    } else {
+      setAuthStatus(as);
+      localStorage.setItem('authStatus', JSON.stringify(as));
+    }
   }
 
   const authStatusComponents = { authStatus: authStatus, setAuthStatus: setAuth };
