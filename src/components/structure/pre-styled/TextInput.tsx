@@ -7,6 +7,7 @@ interface Props {
   value?: string | number,
   error?: boolean,
   className?: string,
+  onchangeEvent?: any,
 }
 
 export default (props: Props) => {
@@ -18,5 +19,6 @@ export default (props: Props) => {
     type={props.type ?? 'text'}
     readOnly={props.readOnly ?? false}
     placeholder={props.placeholder}
+    onChange={props.onchangeEvent}
     value={props.value} />);
 }
