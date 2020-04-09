@@ -25,3 +25,7 @@ export interface ErrorResponse extends BaseResponseObject<RootObject> {
 }
 
 export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export interface ValidationErrors {
+  [id: string]: string[]
+}

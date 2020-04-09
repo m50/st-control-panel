@@ -1,4 +1,4 @@
-import { RootObject } from "./requestTypes";
+import { RootObject } from "./types";
 
 export type Action = 'quarantine' | 'reject' | 'passtag'
 

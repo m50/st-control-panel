@@ -1,4 +1,4 @@
-import { RootObject } from "./requestTypes";
+import { RootObject } from "./types";
 
 export interface Token extends RootObject {
   token_id: string,

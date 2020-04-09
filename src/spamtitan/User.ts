@@ -1,6 +1,6 @@
 import { Role } from "./Role";
 import { Policy } from "./Policy";
-import { RootObject } from "./requestTypes";
+import { RootObject } from "./types";
 
 export interface Alias {
 

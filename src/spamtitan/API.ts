@@ -1,7 +1,7 @@
 import { AuthKey } from "../types";
 import { User } from "./User";
 import { Token } from "./Token";
-import { BodyParameters, BaseResponseObject, RequestMethod, DataResponseObject, ListResponseObject, ErrorResponse, RootObject } from "./requestTypes";
+import { BodyParameters, BaseResponseObject, RequestMethod, DataResponseObject, ListResponseObject, ErrorResponse, RootObject } from "./types";
 import { isNull } from "util";
 
 export default class SpamTitanAPI {
