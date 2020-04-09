@@ -11,6 +11,7 @@ interface Props extends AuthStatusProps { }
 
 const SystemInfoSection: React.FunctionComponent = () => {
   const [port, setPort] = useState(0);
+  // eslint-disable-next-line
   const [version, setVersion] = useState({spamtitan_version: "7.08", api_version: "3.0.0"});
 
   const onClick = () => {
