@@ -7,6 +7,8 @@ import { AuthStatus } from './types';
 import config from './configuration.json';
 import System from './components/pages/System';
 import SpamTitanAPI from './spamtitan/API';
+import TextInput from './components/structure/pre-styled/TextInput';
+import { ReactComponent as SearchIcon} from './components/zondicons/search.svg'
 
 export const api = new SpamTitanAPI([], config.spamtitanInstances);
 
@@ -55,6 +57,9 @@ export default () => {
     <Router>
       <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
         <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
+        <div className={"w-1/2 " + (authStatus.loggedIn ? '' : 'hidden')}>
+          <TextInput placeholder="Search" icon={SearchIcon} className="w-full mb-2" />
+        </div>
         <UserDropdown {...authStatusComponents} />
       </header>
       <Switch>
