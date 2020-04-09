@@ -64,7 +64,7 @@ class LoginForm extends React.Component<FormProps, FormState> {
     return (
       <form onSubmit={this.handleSubmit}
         className="w-screen sm:w-auto h-screen sm:h-auto pt-16 sm:pt-0
-          bg-gray-200 rounded border-b border-orange-400">
+          bg-gray-200 rounded border-b border-orange-400 dark:bg-gray-800">
         <h2 className="hidden sm:block text-lg w-full text-white
             bg-orange-400 py-2 px-2 rounded-t">
           Login:
