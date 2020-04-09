@@ -57,9 +57,11 @@ export default () => {
   return (
     <Router>
       <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
-        <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
-        <div className={"w-1/2 " + (authStatus.loggedIn ? '' : 'hidden')}>
-          <TextInput placeholder="Search" icon={SearchIcon} className="w-full mb-2" />
+        <div className="w-1/2 flex justify-between content-center text-center items-center">
+          <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
+          <div className={"w-1/2 " + (authStatus.loggedIn ? '' : 'hidden')}>
+            <TextInput placeholder="Search" icon={SearchIcon} className="w-full mb-2" />
+          </div>
         </div>
         <UserDropdown {...authStatusComponents} />
       </header>
