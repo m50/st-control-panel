@@ -12,6 +12,10 @@ interface ItemProps {
   link?: string,
 }
 
+interface GeneratorProps {
+  path: string,
+}
+
 export default class Breadcrumbs extends React.Component<Props> {
   static Item: React.FunctionComponent<ItemProps> = (props: ItemProps) => {
     const pProps = {
@@ -21,6 +25,17 @@ export default class Breadcrumbs extends React.Component<Props> {
     return props.link
       ? <NavLink exact {...pProps} to={props.link}>{props.name}</NavLink>
       : <p className={pProps.className}>{props.name}</p>;
+  }
+
+  static Generator: React.FunctionComponent<GeneratorProps> = (props: GeneratorProps) => {
+    const parts = props.path.split('/').filter((part) => part.length > 0);
+    return (
+      <Breadcrumbs>
+        {parts.map((part, i) => {
+          return <Breadcrumbs.Item key={i} name={part} link={'/' + parts.filter((part, l) => l <= i).join('/')} />;
+        })}
+      </Breadcrumbs>
+    )
   }
 
   static Separator: React.FunctionComponent = () => {
