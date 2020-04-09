@@ -1,6 +1,7 @@
 import React from 'react';
 
 interface Props {
+  name?: string,
   type?: 'text' | 'password' | 'number',
   readOnly?: boolean,
   placeholder?: string,
@@ -38,6 +39,7 @@ export default (props: Props) => {
         readOnly={props.readOnly ?? false}
         placeholder={props.placeholder}
         onChange={props.onchangeEvent}
+        name={props.name}
         value={props.value} />
     </div>
   );
