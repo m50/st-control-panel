@@ -3,11 +3,11 @@ import { AuthStatus, AuthStatusProps } from '../../types';
 import { Redirect } from 'react-router';
 import { api, initAuthStatus } from '../../App';
 import config from '../../configuration.json';
-import { ErrorResponse } from '../../spamtitan/requestTypes';
+import { ErrorResponse, ValidationErrors } from '../../spamtitan/types';
 import { User } from '../../spamtitan/User';
 import TextInput from '../structure/pre-styled/TextInput';
 import Label from '../structure/pre-styled/Label';
-import { ErrorBlock } from '../structure/pre-styled/Error';
+import { ErrorBlock, isValidationErrors } from '../structure/pre-styled/Error';
 
 // The types to use in this file.
 interface Props extends AuthStatusProps { } // The props for the LoginPage component.
@@ -15,7 +15,7 @@ interface FormProps extends Props { } // Props for the login form; same as Login
 interface FormState { // State for the login form;
   email: string,
   password: string,
-  errors: string[],
+  errors: string[] | ValidationErrors,
 }
 
 class LoginForm extends React.Component<FormProps, FormState> {
@@ -43,14 +43,10 @@ class LoginForm extends React.Component<FormProps, FormState> {
       .catch((data: ErrorResponse) => {
         if ((data as ErrorResponse).error) {
           const error = (data as ErrorResponse).error;
-          try {
-            const errors = JSON.parse(error);
-
-            console.log(errors);
-            return;
-          } catch (e) {
+          if (isValidationErrors(error)) {
+            this.setState({ errors: error });
+          } else {
             this.setState({ errors: [error] });
-            return;
           }
         }
       });
