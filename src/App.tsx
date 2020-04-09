@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import Sidebar from './components/structure/Sidebar'
+import { BodyWrapper } from './components/structure/BodyWrapper';
 import { UserDropdown } from './components/structure/UserIcon';
 import LoginPage from './components/pages/Login';
 import { AuthStatus } from './types';
@@ -9,8 +9,9 @@ import System from './components/pages/System';
 import SpamTitanAPI from './spamtitan/API';
 import TextInput from './components/structure/pre-styled/TextInput';
 import { ReactComponent as SearchIcon} from './components/zondicons/search.svg'
+import { UserRouter } from './components/pages/Users/Router';
 
-export const api = new SpamTitanAPI([], config.spamtitanInstances);
+export const api = new SpamTitanAPI(config.spamtitanInstances);
 
 export const initAuthStatus: AuthStatus = {
   keys: [],
@@ -63,42 +64,26 @@ export default () => {
         <UserDropdown {...authStatusComponents} />
       </header>
       <Switch>
-        <Route path="/login">
+        <Route exact path="/login">
           <LoginPage {...authStatusComponents} />
         </Route>
-        <Route path="/dashboard">
+        <Route exact path="/dashboard">
           <BodyWrapper loggedIn={authStatus.loggedIn}>
             Dashboard Route
           </BodyWrapper>
         </Route>
-        <Route path="/system">
+        <Route exact path="/system">
           <BodyWrapper loggedIn={authStatus.loggedIn}>
             <System {...authStatusComponents} />
           </BodyWrapper>
         </Route>
-        <Route path="/">
+        <Route path="/users">
+          <UserRouter {...authStatusComponents} />
+        </Route>
+        <Route exact path="/">
           <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
         </Route>
       </Switch>
     </Router>
-  );
-}
-
-interface BodyWrapperProps {
-  children: React.ReactNode,
-  loggedIn: boolean
-}
-
-const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = (props: BodyWrapperProps) => {
-  if (!props.loggedIn) {
-    return <Redirect to="/login" />;
-  }
-  return (
-    <div id="body" className="z-0fixed top-0 left-0 h-screen w-screen flex">
-      <Sidebar />
-      <div className="pt-14 h-full sm:w-11/12 max-w-screen inline-block">
-        {props.children}
-      </div>
-    </div>
   );
 }
