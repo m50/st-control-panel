@@ -24,7 +24,7 @@ export const Section: React.FunctionComponent<Props> = (props: Props) => {
 
   const Cheveron = height === 'auto' ? CheveronUp : CheveronDown;
   return (
-    <section className="text-gray-900 border-b border-gray-300 py-5">
+    <section className="text-gray-900 border-b border-gray-300 py-5 dark:text-gray-100">
       <div className="flex justify-between mb-6 content-center">
         <span className="w-3/4">
           <h2 className="font-bold text-2xl">{props.title}</h2>
@@ -32,7 +32,7 @@ export const Section: React.FunctionComponent<Props> = (props: Props) => {
         </span>
         <span className={"h-10 w-10 " + (!collapsable ? 'hidden' : '')}>
           <button className="
-            text-gray-900 h-10 w-10
+            text-gray-900 dark:text-gray-100 h-10 w-10
             hover:text-orange-600
           " onClick={toggleExpand}>
             <span className="sr-only">{height === 0 ? 'Expand section' : 'Collapse section'}</span>

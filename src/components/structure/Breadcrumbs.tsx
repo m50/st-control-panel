@@ -19,7 +19,7 @@ interface GeneratorProps {
 export default class Breadcrumbs extends React.Component<Props> {
   static Item: React.FunctionComponent<ItemProps> = (props: ItemProps) => {
     const pProps = {
-      className: "inline-block text-gray-600 " + (props.link ? 'hover:text-orange-500' : ''),
+      className: "inline-block text-gray-600 dark:text-gray-400 " + (props.link ? 'hover:text-orange-500' : ''),
       activeClassName: "font-bold"
     };
     return props.link
@@ -39,13 +39,13 @@ export default class Breadcrumbs extends React.Component<Props> {
   }
 
   static Separator: React.FunctionComponent = () => {
-    return <span className="mx-5 font-bold text-lg text-gray-400"><CheveronRight className="inline fill-current h-5 w-5" /></span>;
+    return <span className="mx-5 font-bold text-lg text-gray-400 dark:text-gray-600"><CheveronRight className="inline fill-current h-5 w-5" /></span>;
   }
 
   render() {
     return (
       <div className="my-3 px-2">
-        <div className="bg-gray-200 rounded-lg w-full py-1 px-8">
+        <div className="bg-gray-200 dark:bg-gray-800 rounded-lg w-full py-1 px-8">
           {React.Children.map(this.props.children, (child, i) => {
             if (i > 0) {
               return <><Breadcrumbs.Separator />{child}</>

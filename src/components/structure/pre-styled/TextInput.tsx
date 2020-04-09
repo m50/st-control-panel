@@ -30,7 +30,8 @@ export default (props: Props) => {
       {renderIcon()}
       <input
         className={"text-gray-800 px-5 py-2 border bg-gray-300 block rounded-lg mt-2 "
-          + (props.error ? 'border-red-600 ' : 'border-gray-500 ')
+          + "dark:bg-gray-700 dark:text-gray-200 "
+          + (props.error ? 'border-red-600 dark:border-red-700 ' : 'border-gray-500 dark:border-gray-700 ')
           + (props.readOnly ? 'focus:outline-none ' : ' ')
           + (props.icon ? 'pl-10 ' : ' ')
           + props.className

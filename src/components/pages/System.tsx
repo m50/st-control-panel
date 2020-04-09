@@ -21,7 +21,7 @@ const SystemInfoSection: React.FunctionComponent = () => {
   return (
     <div className="flex flex-col justify-between">
       <div className="flex justify-between mb-5">
-        <div className="flex justify-start border bg-gray-100 border-gray-300 p-2">
+        <div className="flex justify-start border bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 p-2">
           <div className="pr-6">
             <Label>SpamTitan Version</Label>
             <TextInput className="w-20" readOnly value={version.spamtitan_version} />
