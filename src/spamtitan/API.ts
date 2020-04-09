@@ -8,8 +8,12 @@ export default class SpamTitanAPI {
   private authKeys: AuthKey[] = [];
   private servers: string[] = [];
 
-  constructor(authKeys: AuthKey[], servers: string[]) {
-    this.authKeys = authKeys;
+  constructor(servers: string[]) {
+    const authStatus = JSON.parse(localStorage.getItem('authStatus') ?? '{}');
+    if (authStatus.keys) {
+      this.authKeys = authStatus.keys;
+    }
+
     this.servers = servers;
   }
 
@@ -102,11 +106,14 @@ export default class SpamTitanAPI {
     return success;
   }
 
-  query = async <RespType>(
+  query = async <RespObject extends RootObject>(
     method: RequestMethod,
     endPoint: string,
     body?: BodyParameters
-  ): Promise<BaseResponseObject<RespType>> => {
+  ): Promise<BaseResponseObject<RespObject>> => {
+    if (this.authKeys.length < 1) {
+      throw new Error('There are no auth keys.');
+    }
     const authKey: AuthKey = this.authKeys[Math.round(Math.random() * this.authKeys.length)];
     body = body ?? {};
 
@@ -116,15 +123,15 @@ export default class SpamTitanAPI {
 
     body.validation_errors = true;
 
-    return this.makeRequest<RespType>(method, `${authKey.spamtitan}/restapi/${endPoint.replace(/^\/|\/$/g, '')}`, body, headers);
+    return this.makeRequest<RespObject>(method, `${authKey.spamtitan}/restapi/${endPoint.replace(/^\/|\/$/g, '')}`, body, headers);
   }
 
-  private makeRequest = async <RespType>(
+  private makeRequest = async <RespObject extends RootObject>(
     method: RequestMethod,
     url: string,
     body?: BodyParameters,
     headers?: Record<string, string>
-  ): Promise<BaseResponseObject<RespType>> => {
+  ): Promise<BaseResponseObject<RespObject>> => {
     let h = headers ?? {};
     h['Content-Type'] = 'application/json';
     h['Accept'] = 'application/json';
@@ -142,7 +149,7 @@ export default class SpamTitanAPI {
 
     if (object === 'list') {
       const { count, total, data } = rest;
-      const responseObject: ListResponseObject<RespType> = {
+      const responseObject: ListResponseObject<RespObject> = {
         objectType: object,
         code: code,
         total: total,
@@ -154,7 +161,7 @@ export default class SpamTitanAPI {
     }
 
     if (object) {
-      const responseObject: DataResponseObject<RespType> = {
+      const responseObject: DataResponseObject<RespObject> = {
         objectType: object,
         code: code,
         object: rest,
