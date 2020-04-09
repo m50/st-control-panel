@@ -7,7 +7,7 @@ import { ErrorResponse } from '../../spamtitan/requestTypes';
 import { User } from '../../spamtitan/User';
 import TextInput from '../structure/pre-styled/TextInput';
 import Label from '../structure/pre-styled/Label';
-import { ReactComponent as ErrorIcon } from '../zondicons/close-solid.svg';
+import { ErrorBlock } from '../structure/pre-styled/Error';
 
 // The types to use in this file.
 interface Props extends AuthStatusProps { } // The props for the LoginPage component.
@@ -85,16 +85,7 @@ class LoginForm extends React.Component<FormProps, FormState> {
           <input type="submit"
             className="text-white bg-orange-400 mt-8 py-2 px-4 rounded hover:bg-orange-500"
             value="Login" />
-          <small className={
-            "p-2 text-red-600 text-sm mt-5 bg-red-100 border border-red-300 rounded " +
-            (this.state.errors.length > 0 ? 'block' : 'hidden')
-          }>
-            <ul className="">
-              {this.state.errors.map((error, i) => {
-                return <li key={i}><ErrorIcon className="fill-current w-3 h-3 inline-block" /> {error}</li>;
-              })}
-            </ul>
-          </small>
+          <ErrorBlock errors={this.state.errors} />
         </div>
       </form>
     );
