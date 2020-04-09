@@ -6,6 +6,10 @@ module.exports = {
       },
       height: {
         14: '3.5rem',
+      },
+      screens: {
+        'dark': {'raw': '(prefers-color-scheme: dark)'},
+        'light': {'raw': '(prefers-color-scheme: light)'},
       }
     },
   },
