@@ -85,7 +85,7 @@ export default class SpamTitanAPI {
     let success = true;
     const responses = await Promise.all(this.authKeys.map((authKey: AuthKey): null | Promise<{response: BaseResponseObject<RootObject>, authKey: AuthKey}> => {
       if (authKey.keyId) {
-        return this.query<RootObject>('DELETE', `auth/tokens/${authKey.keyId}`)
+        return this.query<RootObject>('DELETE', `auth/tokens/${authKey.keyId}`, {}, authKey)
           .then((response) => { return { response: response, authKey: authKey }; });
       }
 
@@ -109,13 +109,18 @@ export default class SpamTitanAPI {
   query = async <RespObject extends RootObject>(
     method: RequestMethod,
     endPoint: string,
-    body?: BodyParameters
+    body?: BodyParameters,
+    specifiedKey?: AuthKey,
   ): Promise<BaseResponseObject<RespObject>> => {
     if (this.authKeys.length < 1) {
       throw new Error('There are no auth keys.');
     }
-    const authKey: AuthKey = this.authKeys[Math.round(Math.random() * this.authKeys.length)];
+    const authKey: AuthKey = specifiedKey ?? this.authKeys[Math.round(Math.random() * this.authKeys.length)];
     body = body ?? {};
+
+    if (!authKey.key) {
+      throw new Error('Key cannot be found.');
+    }
 
     const headers: Record<string, string> = {
       Authorization: `Bearer ${authKey.key}`,
