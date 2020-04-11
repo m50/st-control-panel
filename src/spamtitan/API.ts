@@ -84,7 +84,7 @@ export default class SpamTitanAPI {
   logout = async (): Promise<boolean> => {
     let success = true;
     const responses = await Promise.all(this.authKeys.map((authKey: AuthKey): null | Promise<{response: BaseResponseObject<RootObject>, authKey: AuthKey}> => {
-      if (authKey.keyId) {
+      if (authKey) {
         return this.query<RootObject>('DELETE', `auth/tokens/${authKey.keyId}`, {}, authKey)
           .then((response) => { return { response: response, authKey: authKey }; });
       }
@@ -115,10 +115,10 @@ export default class SpamTitanAPI {
     if (this.authKeys.length < 1) {
       throw new Error('There are no auth keys.');
     }
-    const authKey: AuthKey = specifiedKey ?? this.authKeys[Math.round(Math.random() * this.authKeys.length)];
+    const authKey: AuthKey = specifiedKey ?? this.authKeys[Math.floor(Math.random() * this.authKeys.length)];
     body = body ?? {};
 
-    if (!authKey.key) {
+    if (!authKey) {
       throw new Error('Key cannot be found.');
     }
 
@@ -180,6 +180,10 @@ export default class SpamTitanAPI {
       code: code,
       error: error,
     };
+
+    if (responseObject.code === 401) {
+      localStorage.removeItem('authStatus');
+    }
 
     return responseObject;
   }
