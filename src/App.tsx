@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, ChangeEvent, useEffect} from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import { BodyWrapper } from './components/structure/BodyWrapper';
 import { UserDropdown } from './components/structure/UserIcon';
@@ -22,19 +22,22 @@ export const initAuthStatus: AuthStatus = {
 let logoutTimer: NodeJS.Timeout;
 
 export default () => {
+  const [search, setSearch] = useState('');
   const [authStatus, setAuthStatus] = useState(
     JSON.parse(localStorage.getItem('authStatus') ?? JSON.stringify(initAuthStatus))
   );
+
+  useEffect(() => {
+    localStorage.setItem('authStatus', JSON.stringify(authStatus));
+  }, [authStatus]);
 
   const setAuth: CallableFunction = (as: AuthStatus) => {
     if (!as.loggedIn) {
       api.logout().then(() => {
         setAuthStatus(as);
-        localStorage.setItem('authStatus', JSON.stringify(as));
       });
     } else {
       setAuthStatus(as);
-      localStorage.setItem('authStatus', JSON.stringify(as));
     }
   }
 
@@ -61,7 +64,11 @@ export default () => {
           <div className="w-1/2 flex justify-between content-center text-center items-center">
             <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
             <div className={"w-1/2 " + (authStatus.loggedIn ? '' : 'hidden')}>
-              <TextInput placeholder="Search" icon={SearchIcon} className="w-full mb-2" />
+              <TextInput placeholder="Search"
+                value={search}
+                onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setSearch(ev.target?.value)}
+                icon={SearchIcon}
+                className="w-full mb-2" />
             </div>
           </div>
           <UserDropdown {...authStatusComponents} />
