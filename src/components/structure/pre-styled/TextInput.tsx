@@ -28,20 +28,20 @@ export default (props: Props) => {
   return (
     <div className="relative">
       {renderIcon()}
-      <input
-        className={"text-gray-800 px-5 py-2 border bg-gray-300 block rounded-lg mt-2 "
+    <input
+        className={"text-gray-800 px-5 py-2 bg-gray-300 block rounded-lg mt-2 "
           + "dark:bg-gray-700 dark:text-gray-200 "
-          + (props.error ? 'border-red-600 dark:border-red-700 ' : 'border-gray-500 dark:border-gray-700 ')
-          + (props.readOnly ? 'focus:outline-none ' : ' ')
-          + (props.icon ? 'pl-10 ' : ' ')
-          + props.className
+          + (props.error ? 'border-2 border-red-400 dark:border-red-700 ' : 'border border-gray-500 dark:border-gray-700 ')
+          + (props.readOnly ? 'focus:outline-none ' : '')
+          + (props.icon ? 'pl-10 ' : '')
+          + (props.className ?? '')
         }
         type={props.type ?? 'text'}
         readOnly={props.readOnly ?? false}
         placeholder={props.placeholder}
-        onChange={props.onchangeEvent}
+        onChange={props.onchangeEvent ?? (() => {})}
         name={props.name}
-        value={props.value} />
+        value={props.value ?? ''} />
     </div>
   );
 }
