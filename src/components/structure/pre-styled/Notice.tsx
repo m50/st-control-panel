@@ -21,10 +21,12 @@ export function isValidationErrors(errors: string | string[] | ValidationErrors)
   return !Array.isArray(errors) && typeof errors !== 'string';
 }
 
+type SVG = React.FC<React.SVGProps<SVGSVGElement> & { title?: string | undefined; }>;
+
 export const Notice: React.FC<Props> = (props: Props) => {
-  const [noticeIcon, setNoticeIcon] = useState<
-    React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string | undefined; }>
-  >(ErrorIcon);
+  const [noticeIcon, setNoticeIcon] = useState<SVG>(ErrorIcon);
+  const [errors, setErrors] = useState<{ icon: SVG, error: string }[]>([]);
+
   useEffect(() => {
     if (props.successLevel === SuccessLevel.success) {
       setNoticeIcon(SuccessIcon);
@@ -36,17 +38,21 @@ export const Notice: React.FC<Props> = (props: Props) => {
       setNoticeIcon(ErrorIcon);
     }
   }, [props.successLevel]);
-  let errArray: string[] = [];
-  if (isValidationErrors(props.errors)) {
-    errArray = Object.values(props.errors).flat();
-  } else if (typeof props.errors === 'string') {
-    errArray = [props.errors];
-  } else {
-    errArray = props.errors;
-  }
-  const errors = errArray.filter((err) => err.length > 0).map((err) => {
-    return { icon: noticeIcon, error: err };
-  });
+
+  useEffect(() => {
+    let errArray: string[] = [];
+    if (isValidationErrors(props.errors)) {
+      errArray = Object.values(props.errors).flat();
+    } else if (typeof props.errors === 'string') {
+      errArray = [props.errors];
+    } else {
+      errArray = props.errors;
+    }
+    setErrors(errArray.filter((err) => err.length > 0).map((err) => {
+      return { icon: noticeIcon, error: err };
+    }));
+  }, [props.errors, noticeIcon]);
+
   return (
     <small className={
       "p-2 text-lg mt-5 border rounded " +
