@@ -2,5 +2,7 @@
     "spamtitanInstances": [
         "https://st-demo.titanhq.com"
     ],
-    "logoutTimer": 30
+    "logoutTimer": 30,
+    "maxLoginAttempts": 3,
+    "hoursUntilTokenExpiration": 24
 }
