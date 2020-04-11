@@ -7,7 +7,7 @@ import { ErrorResponse, ValidationErrors } from '../../spamtitan/types';
 import { User } from '../../spamtitan/User';
 import TextInput from '../structure/pre-styled/TextInput';
 import Label from '../structure/pre-styled/Label';
-import { ErrorBlock, isValidationErrors } from '../structure/pre-styled/Error';
+import { Notice, isValidationErrors } from '../structure/pre-styled/Notice';
 
 // The types to use in this file.
 interface Props extends AuthStatusProps { } // The props for the LoginPage component.
@@ -81,7 +81,7 @@ class LoginForm extends React.Component<FormProps, FormState> {
           <input type="submit"
             className="text-white bg-orange-400 mt-8 py-2 px-4 rounded hover:bg-orange-500"
             value="Login" />
-          <ErrorBlock errors={this.state.errors} />
+          <Notice errors={this.state.errors} />
         </div>
       </form>
     );
