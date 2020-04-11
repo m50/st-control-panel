@@ -26,10 +26,10 @@ export default (props: Props) => {
     return <></>;
   }
   return (
-    <div className="relative">
+    <div className="relative z-0">
       {renderIcon()}
     <input
-        className={"text-gray-800 px-5 py-2 bg-gray-300 block rounded-lg mt-2 "
+        className={"z-0 text-gray-800 px-5 py-2 bg-gray-300 block rounded-lg mt-2 "
           + "dark:bg-gray-700 dark:text-gray-200 "
           + (props.error ? 'border-2 border-red-400 dark:border-red-700 ' : 'border border-gray-500 dark:border-gray-700 ')
           + (props.readOnly ? 'focus:outline-none ' : '')

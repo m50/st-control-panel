@@ -61,9 +61,9 @@ export default () => {
     <Router>
       <div className="bg-white dark:bg-gray-900">
         <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
-          <div className="w-1/2 flex justify-between content-center text-center items-center">
+          <div className="w-full sm:w-1/2 flex justify-between content-center text-center items-center">
             <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
-            <div className={"w-1/2 " + (authStatus.loggedIn ? '' : 'hidden')}>
+            <div className={"w-1/2 hidden " + (authStatus.loggedIn ? 'sm:block' : 'hidden')}>
               <TextInput placeholder="Search"
                 value={search}
                 onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setSearch(ev.target?.value)}

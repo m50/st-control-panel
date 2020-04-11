@@ -32,7 +32,7 @@ export default class Sidebar extends React.Component<SidebarProps, SidebarState>
   ]
 
   className: string = `
-    h-full bg-gray-700 w-screen flex-col justify-between pt-0 fixed left-0 top-0 pt-14
+    h-full bg-gray-700 w-screen flex-col justify-between pt-0 fixed left-0 top-0 pt-14 z-20
     transform transition-transform duration-300 ease-in-out
     sm:z-0 flex md:translate-x-0 sm:relative
   `
