@@ -3,6 +3,7 @@ import { User } from "./User";
 import { Token } from "./Token";
 import { BodyParameters, BaseResponseObject, RequestMethod, DataResponseObject, ListResponseObject, ErrorResponse, RootObject } from "./types";
 import { isNull } from "util";
+import config from '../configuration.json';
 
 export default class SpamTitanAPI {
   private authKeys: AuthKey[] = [];
@@ -30,7 +31,8 @@ export default class SpamTitanAPI {
           password: password,
           validation_errors: true,
           expires: true,
-          expiration_date: new Date(Date.now() + 1000 /*sec*/ * 60 /*min*/ * 60 /*hour*/ * 24 /*day*/),
+          expiration_date: new Date(Date.now() +
+            (1000 /*msec*/ * 60 /*sec*/ * 60 /*min*/ * config.hoursUntilTokenExpiration /*hours*/)),
         }).then((response) => {
           return {
             spamtitan: server,
