@@ -1,68 +1,49 @@
-import React, { ChangeEvent, FormEvent } from 'react';
-import { AuthStatus, AuthStatusProps } from '../../types';
+import React, { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { AuthStatus } from '../../types';
 import { Redirect } from 'react-router';
-import { api, initAuthStatus } from '../../App';
+import { api } from '../../App';
 import config from '../../configuration.json';
 import { ErrorResponse, ValidationErrors } from '../../spamtitan/types';
 import { User } from '../../spamtitan/User';
 import TextInput from '../structure/pre-styled/TextInput';
 import Label from '../structure/pre-styled/Label';
-import { Notice, isValidationErrors } from '../structure/pre-styled/Notice';
+import { Notice } from '../structure/pre-styled/Notice';
+import { AuthContext, initAuthStatus } from '../../AuthContext';
 
-// The types to use in this file.
-interface Props extends AuthStatusProps { } // The props for the LoginPage component.
-interface FormProps extends Props { } // Props for the login form; same as LoginPage for now.
 interface FormState { // State for the login form;
   email: string,
   password: string,
   errors: string[] | ValidationErrors,
 }
 
-class LoginForm extends React.Component<FormProps, FormState> {
-  constructor(props: FormProps) {
-    super(props);
-    this.state = {
-      email: '',
-      password: '',
-      errors: [],
-    };
-  }
+const LoginForm: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<string | string[] | ValidationErrors>([]);
+  const { setAuthStatus } = useContext(AuthContext);
 
-  handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    api.auth(this.state.email, this.state.password)
+    api.auth(email, password)
       .then((user: User) => {
         const authStatus: AuthStatus = {
           loggedIn: true,
           keys: api.getKeys(),
           user: user,
         };
-        setTimeout(() => this.props.setAuthStatus(initAuthStatus), config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */);
-        this.props.setAuthStatus(authStatus);
+        setTimeout(() => setAuthStatus(initAuthStatus), config.logoutTimer /* minutes */ * 60 /* seconds */ * 1000 /* milliseconds */);
+        setAuthStatus(authStatus);
       })
       .catch((data: ErrorResponse) => {
         if ((data as ErrorResponse).error) {
           const error = (data as ErrorResponse).error;
-          if (isValidationErrors(error)) {
-            this.setState({ errors: error });
-          } else {
-            this.setState({ errors: [error] });
-          }
+          setErrors(error);
         }
       });
   }
 
-  handleEmailInput = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({email: event.target?.value});
-  }
-
-  handlePasswordInput = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({password: event.target?.value});
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit}
+  return (
+      <form onSubmit={handleSubmit}
         className="w-screen sm:w-auto h-screen sm:h-auto pt-16 sm:pt-0
           bg-gray-200 rounded border-b border-orange-400 dark:bg-gray-800">
         <h2 className="hidden sm:block text-lg w-full text-white
@@ -72,31 +53,31 @@ class LoginForm extends React.Component<FormProps, FormState> {
         <div className="h-full sm:h-auto flex flex-col justify-center sm:justify-between px-10 py-5">
           <div className="py-2">
             <Label>Email</Label>
-            <TextInput value={this.state.email} onchangeEvent={this.handleEmailInput} />
+            <TextInput value={email} onchangeEvent={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target?.value)} />
           </div>
           <div className="py-2">
             <Label>Password</Label>
-            <TextInput value={this.state.password} type="password" onchangeEvent={this.handlePasswordInput} />
+            <TextInput value={password} type="password" onchangeEvent={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target?.value)} />
           </div>
           <input type="submit"
             className="text-white bg-orange-400 mt-8 py-2 px-4 rounded hover:bg-orange-500"
             value="Login" />
-          <Notice errors={this.state.errors} />
+          <Notice errors={errors} />
         </div>
       </form>
     );
-  }
 }
 
 // The form wrapper for styling purposes.
-export default (props: Props) => {
-  if (props.authStatus.loggedIn) {
+export default () => {
+  const { authStatus } = useContext(AuthContext);
+  if (authStatus.loggedIn) {
     return <Redirect to="/dashboard" />;
   }
   return (
     <div className="flex flex-col content-center justify-center h-screen w-screen">
       <div className="flex content-center justify-center">
-        <LoginForm {...props} />
+        <LoginForm />
       </div>
     </div>
   );

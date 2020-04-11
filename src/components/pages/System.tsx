@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Container from '../structure/Container';
-import { AuthStatusProps } from '../../types';
 import { Section } from '../structure/Section';
 import Breadcrumbs from '../structure/Breadcrumbs';
 import Button from '../structure/pre-styled/Button';
 import Label from '../structure/pre-styled/Label';
 import TextInput from '../structure/pre-styled/TextInput';
-
-interface Props extends AuthStatusProps { }
+import { useRouteMatch } from 'react-router';
 
 const SystemInfoSection: React.FunctionComponent = () => {
   const [port, setPort] = useState(0);
@@ -62,12 +60,11 @@ const LicenseSection: React.FunctionComponent = () => {
   );
 }
 
-export default (props: Props) => {
+export default () => {
+  let { path } = useRouteMatch();
   return (
     <Container>
-      <Breadcrumbs>
-        <Breadcrumbs.Item name="System" link="/system" />
-      </Breadcrumbs>
+      <Breadcrumbs.Generator path={path} />
       <Section title="System Info" tagline="Some basic information on the system." expanded={true}>
         <SystemInfoSection />
       </Section>

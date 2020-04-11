@@ -17,8 +17,3 @@ export interface AuthStatus {
     keys: AuthKey[],
     user: User | {},
 }
-
-export interface AuthStatusProps {
-    authStatus: AuthStatus,
-    setAuthStatus: CallableFunction,
-}

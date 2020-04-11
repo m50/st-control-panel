@@ -10,22 +10,17 @@ import SpamTitanAPI from './spamtitan/API';
 import TextInput from './components/structure/pre-styled/TextInput';
 import { ReactComponent as SearchIcon} from './components/zondicons/search.svg'
 import { UserRouter } from './components/pages/Users/Router';
+import { initAuthStatus, AuthContext } from './AuthContext';
 
 export const api = new SpamTitanAPI(config.spamtitanInstances);
 
-export const initAuthStatus: AuthStatus = {
-  keys: [],
-  loggedIn: false,
-  user: {},
-}
-
-let logoutTimer: NodeJS.Timeout;
 
 export default () => {
   const [search, setSearch] = useState('');
   const [authStatus, setAuthStatus] = useState(
     JSON.parse(localStorage.getItem('authStatus') ?? JSON.stringify(initAuthStatus))
   );
+  let logoutTimer: NodeJS.Timeout;
 
   useEffect(() => {
     localStorage.setItem('authStatus', JSON.stringify(authStatus));
@@ -58,8 +53,8 @@ export default () => {
     setLogoutTimer();
   });
   return (
-    <Router>
-      <div className="bg-white dark:bg-gray-900">
+    <div className="bg-white dark:bg-gray-900">
+      <AuthContext.Provider value={authStatusComponents}>
         <header className="w-screen fixed left-0 top-0 z-50 bg-orange-500 flex items-center justify-between text-white h-14">
           <div className="w-full sm:w-1/2 flex justify-between content-center text-center items-center">
             <h1 className="text-xl my-2 mx-5">SpamTitan Control Panel</h1>
@@ -71,30 +66,30 @@ export default () => {
                 className="w-full mb-2" />
             </div>
           </div>
-          <UserDropdown {...authStatusComponents} />
+          <UserDropdown />
         </header>
-        <Switch>
-          <Route exact path="/login">
-            <LoginPage {...authStatusComponents} />
-          </Route>
-          <Route exact path="/dashboard">
-            <BodyWrapper loggedIn={authStatus.loggedIn}>
-              Dashboard Route
+        <Router>
+          <Switch>
+            <BodyWrapper>
+              <Route exact path="/login">
+                <LoginPage />
+              </Route>
+              <Route exact path="/dashboard">
+                Dashboard Route
+              </Route>
+              <Route exact path="/system">
+                <System />
+              </Route>
+              <Route path="/users">
+                <UserRouter />
+              </Route>
             </BodyWrapper>
-          </Route>
-          <Route exact path="/system">
-            <BodyWrapper loggedIn={authStatus.loggedIn}>
-              <System {...authStatusComponents} />
-            </BodyWrapper>
-          </Route>
-          <Route path="/users">
-            <UserRouter {...authStatusComponents} />
-          </Route>
-          <Route exact path="/">
-            <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
+            <Route exact path="/">
+              <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
+            </Route>
+          </Switch>
+        </Router>
+      </AuthContext.Provider>
+    </div>
   );
 }

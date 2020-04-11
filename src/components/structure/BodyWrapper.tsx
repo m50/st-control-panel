@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Redirect } from 'react-router';
 import Sidebar from './Sidebar';
+import { AuthContext } from '../../AuthContext';
 
 interface BodyWrapperProps {
   children: React.ReactNode,
-  loggedIn: boolean
 }
 
 export const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = (props: BodyWrapperProps) => {
-  if (!props.loggedIn) {
+  const { authStatus } = useContext(AuthContext);
+  if (!authStatus.loggedIn) {
     return <Redirect to="/login" />;
   }
   return (

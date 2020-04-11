@@ -1,5 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { AuthStatusProps } from '../../../types';
+import React, { useState, useEffect, ChangeEvent, useContext } from 'react';
 import { useParams, useRouteMatch } from 'react-router';
 import { User } from '../../../spamtitan/User';
 import { api } from '../../../App';
@@ -13,19 +12,19 @@ import Label from '../../structure/pre-styled/Label';
 import Button from '../../structure/pre-styled/Button';
 import { isValidationErrors } from '../../structure/pre-styled/Notice';
 import { RootObject } from '../../../spamtitan/types';
+import { AuthContext } from '../../../AuthContext';
 
-interface Props extends AuthStatusProps { }
-
-export const UserShow: React.FunctionComponent<Props> = (props: Props) => {
+export const UserShow: React.FunctionComponent = () => {
   const { id } = useParams();
   const userId = +(id as string);
   const [user, setUser] = useState<User | {}>({});
   const [error, setError] = useState<string>('');
   let { url } = useRouteMatch();
+  let { authStatus } = useContext(AuthContext);
 
   useEffect(() => {
-    if (userId === (props.authStatus.user as User).id) {
-      setUser((props.authStatus.user as User));
+    if (userId === (authStatus.user as User).id) {
+      setUser((authStatus.user as User));
     } else {
       api.query<User>('GET', `users/${userId}`)
         .then((response: BaseResponseObject<User>) => {
@@ -36,7 +35,7 @@ export const UserShow: React.FunctionComponent<Props> = (props: Props) => {
           }
         });
     }
-  }, [props.authStatus.user, userId])
+  }, [authStatus.user, userId])
 
   return (
     <>

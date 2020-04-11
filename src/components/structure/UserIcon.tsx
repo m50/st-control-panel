@@ -1,14 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { AuthStatusProps } from '../../types';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { ReactComponent as UserIcon } from '../zondicons/user-solid-circle.svg';
 import { ReactComponent as LogoutIcon } from '../zondicons/travel-walk.svg';
-import { initAuthStatus } from '../../App';
+import { initAuthStatus, AuthContext } from '../../AuthContext';
 import { User } from '../../spamtitan/User';
 
-interface Props extends AuthStatusProps { }
-
-export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
+export const UserDropdown: React.FunctionComponent = () => {
   const [popUpVisible, setPopUpVisisble] = useState(false);
+  const { authStatus, setAuthStatus } = useContext(AuthContext);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropDownRef = useRef<HTMLDivElement>(null);
 
@@ -26,7 +24,7 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  if (!props.authStatus.loggedIn) {
+  if (!authStatus.loggedIn) {
     if (popUpVisible) {
       setPopUpVisisble(false);
     }
@@ -35,13 +33,13 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
 
   const togglePopUp = () => setPopUpVisisble(!popUpVisible);
 
-  const logout = () => props.setAuthStatus(initAuthStatus);
+  const logout = () => setAuthStatus(initAuthStatus);
 
-  let initials = (props.authStatus.user as User).first_name.substr(0, 1).toUpperCase() +
-    (props.authStatus.user as User).last_name.substr(0, 1).toUpperCase();
+  let initials = (authStatus.user as User).first_name.substr(0, 1).toUpperCase() +
+    (authStatus.user as User).last_name.substr(0, 1).toUpperCase();
 
   if (initials.length === 0) {
-    initials = (props.authStatus.user as User).email.substr(0, 2).toUpperCase();
+    initials = (authStatus.user as User).email.substr(0, 2).toUpperCase();
   }
 
   return (
@@ -60,7 +58,7 @@ export const UserDropdown: React.FunctionComponent<Props> = (props: Props) => {
           ` + (popUpVisible ? 'block' : 'hidden')
         }
       >
-        <a href={`/users/${(props.authStatus.user as User).id}`} className="text-lg py-2 hover:text-orange-500 hover:underline border-b border-gray-400">
+        <a href={`/users/${(authStatus.user as User).id}`} className="text-lg py-2 hover:text-orange-500 hover:underline border-b border-gray-400">
           <UserIcon className="fill-current w-5 h-5 inline mr-4" />
           User Profile
         </a>
