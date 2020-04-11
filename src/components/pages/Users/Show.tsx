@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { AuthStatusProps } from '../../../types';
 import { useParams, useRouteMatch } from 'react-router';
 import { User } from '../../../spamtitan/User';
 import { api } from '../../../App';
 import { BaseResponseObject, ErrorResponse, ValidationErrors } from '../../../spamtitan/types';
-import { responseIsDataObject } from '../../../spamtitan/API';
-import { ErrorBlock } from '../../structure/pre-styled/Error';
+import { responseIsDataObject, responseIsError } from '../../../spamtitan/API';
+import { Notice, SuccessLevel } from '../../structure/pre-styled/Notice';
 import Breadcrumbs from '../../structure/Breadcrumbs';
 import { Section } from '../../structure/Section';
 import TextInput from '../../structure/pre-styled/TextInput';
 import Label from '../../structure/pre-styled/Label';
 import Button from '../../structure/pre-styled/Button';
-import { isValidationErrors } from '../../structure/pre-styled/Error';
+import { isValidationErrors } from '../../structure/pre-styled/Notice';
+import { RootObject } from '../../../spamtitan/types';
 
 interface Props extends AuthStatusProps { }
 
@@ -40,19 +41,21 @@ export const UserShow: React.FunctionComponent<Props> = (props: Props) => {
   return (
     <>
       <Breadcrumbs.Generator path={url} />
-      <ErrorBlock errors={[error]} />
+      <Notice errors={[error]} />
       <Section title="User Management" tagline="Manage generic user details." expanded={true}>
-        <div className="flex items-center content-center text-center mb-10 ">
-          <Label className="mr-5">User's Email Address:</Label>
+        <Label className="flex items-center content-center text-center mb-10">
+          <span className="mr-5">Email Address:</span>
           <TextInput readOnly={true} value={(user as User).email} />
-        </div>
+        </Label>
         <NameArea user={(user as User)} />
         <PasswordArea user={(user as User)} />
       </Section>
-      <Section title="Allow List" tagline="Specify allowed emails and domains.">
-      </Section>
-      <Section title="Block List" tagline="Specify blocked emails and domains.">
-      </Section>
+      {/* <div className={(user as User).email === 'admin' ? 'hidden' : 'block'}> */}
+        <Section title="Allow List" tagline="Specify allowed emails and domains.">
+        </Section>
+        <Section title="Block List" tagline="Specify blocked emails and domains.">
+        </Section>
+      {/* </div> */}
     </>
   );
 }
@@ -61,9 +64,13 @@ interface AreaProps {
   user: User,
 }
 
-const NameArea: React.FC<AreaProps> = (props: AreaProps) => {
-  const [errors, setErrors] = useState<string[] | ValidationErrors>([]);
+const NameArea: React.FC<AreaProps> = ({ user }: AreaProps) => {
+  const [errors, setErrors] = useState<string | string[] | ValidationErrors>([]);
+  const [successLevel, setSuccessLevel] = useState(SuccessLevel.error);
   const [toHighlight, setToHighlight] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [comment, setComment] = useState(user.comment);
 
   useEffect(() => {
     if (isValidationErrors(errors)) {
@@ -71,36 +78,84 @@ const NameArea: React.FC<AreaProps> = (props: AreaProps) => {
     }
   }, [errors]);
 
+  useEffect(() => {
+    setFirstName(user.first_name);
+    setLastName(user.last_name);
+    setComment(user.comment);
+  }, [user])
+
   const save = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setErrors([]);
+    const data: { first_name?: string, last_name?: string, comment?: string } = {
+      first_name: firstName,
+      last_name: lastName,
+      comment: comment,
+    };
+    api.query<User>('PUT', `users/${user.id}`, data)
+      .then((response: BaseResponseObject<User>) => {
+        if (responseIsError(response)) {
+          setErrors(response.error);
+          setSuccessLevel(SuccessLevel.error);
+        } else {
+          setSuccessLevel(SuccessLevel.success);
+          setErrors('Successfully updated the name fields on the user.');
+        }
+      }).catch(error => {
+        if (responseIsError(error)) {
+          setErrors(error.error);
+          setSuccessLevel(SuccessLevel.error);
+        } else {
+          setErrors(error);
+          setSuccessLevel(SuccessLevel.warning);
+        }
+      })
   }
 
   return (
     <div className="mb-10">
       <h3 className="text-2xl font-semibold">Set User's name</h3>
-      <div className="flex w-full">
+      <p className="max-w-xl text-sm">
+        The first and last name are used internally in SpamTitan for preventing spam
+        that attempts to impersonate a user. The comment is just some information
+        about a user, such as they are an administrator, or are the CEO, or equivelent.
+      </p>
+      <div className="flex flex-wrap w-full mt-2">
         <span className="mr-4">
-          <Label for="first_name">First Name</Label>
-          <TextInput name="first_name" value={props.user.first_name} error={toHighlight.includes('first_name')} />
+          <Label for="first_name">First Name
+            <TextInput name="first_name"
+              value={firstName}
+              onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setFirstName(ev.target?.value)}
+              error={toHighlight.includes('first_name')} />
+          </Label>
         </span>
         <span className="mr-4">
-          <Label for="last_name">Last Name</Label>
-          <TextInput name="last_name" value={props.user.last_name} error={toHighlight.includes('last_name')} />
+          <Label for="last_name">Last Name
+            <TextInput name="last_name"
+              value={lastName}
+              onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setLastName(ev.target?.value)}
+              error={toHighlight.includes('last_name')} />
+          </Label>
         </span>
         <span className="mr-4">
-          <Label for="comment">Comment</Label>
-          <TextInput name="comment" value={props.user.comment} error={toHighlight.includes('comment')} />
+          <Label for="comment">Comment
+            <TextInput name="comment"
+              value={comment}
+              onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setComment(ev.target?.value)}
+              error={toHighlight.includes('comment')} />
+          </Label>
         </span>
       </div>
       <Button onClick={save}>Save</Button>
-      <ErrorBlock errors={errors} />
+      <Notice errors={errors} successLevel={successLevel} />
     </div>
   );
 }
 
 const PasswordArea: React.FC<AreaProps> = (props: AreaProps) => {
   const [errors, setErrors] = useState<string[] | ValidationErrors>([]);
+  const [successLevel, setSuccessLevel] = useState(SuccessLevel.error);
   const [toHighlight, setToHighlight] = useState<string[]>([]);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     if (isValidationErrors(errors)) {
@@ -109,32 +164,53 @@ const PasswordArea: React.FC<AreaProps> = (props: AreaProps) => {
   }, [errors]);
 
   const save = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setErrors({
-      password: [
-        'Password is too short.',
-        'Password does not contain required characters.',
-      ],
-      confirm_password: [
-        'Confirm password does not match password.',
-      ],
+    api.query<RootObject>('PUT', 'auth/password', {
+      password: password,
+      confirm_password: confirmPassword,
+    }).then((response: BaseResponseObject<RootObject>) => {
+      if (responseIsError(response)) {
+        setErrors(response.error);
+        setSuccessLevel(SuccessLevel.error);
+      } else {
+        setErrors(['Successfully updated password!']);
+        setSuccessLevel(SuccessLevel.success);
+      }
+    }).catch((error) => {
+      if (responseIsError(error)) {
+        setErrors(error.error);
+        setSuccessLevel(SuccessLevel.error);
+      } else {
+        setErrors(error);
+        setSuccessLevel(SuccessLevel.warning);
+      }
     });
   }
 
   return (
     <div>
       <h3 className="text-2xl font-semibold">Set a new password</h3>
+      <p>
+      </p>
       <div className="flex w-1/2">
         <span className="mr-4">
-          <Label for="password">New Password</Label>
-          <TextInput name="password" error={toHighlight.includes('password')} />
+          <Label for="password">New Password
+            <TextInput name="password"
+              value={password}
+              onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setPassword(ev.target?.value)}
+              error={toHighlight.includes('password')} />
+          </Label>
         </span>
         <span className="mr-4">
-          <Label for="confirm_password">Confirm Password</Label>
-          <TextInput name="confirm_password" error={toHighlight.includes('confirm_password')} />
+          <Label for="confirm_password">Confirm Password
+            <TextInput name="confirm_password"
+              value={confirmPassword}
+              onchangeEvent={(ev: ChangeEvent<HTMLInputElement>) => setConfirmPassword(ev.target?.value)}
+              error={toHighlight.includes('confirm_password')} />
+          </Label>
         </span>
       </div>
       <Button onClick={save}>Save</Button>
-      <ErrorBlock errors={errors} />
+      <Notice errors={errors} successLevel={successLevel} />
     </div>
   );
 }
