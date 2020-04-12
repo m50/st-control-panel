@@ -71,10 +71,13 @@ export default () => {
         </header>
         <Router>
           <Switch>
+            <Route exact path="/login">
+              <LoginPage />
+            </Route>
+            <Route exact path="/">
+              <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
+            </Route>
             <BodyWrapper>
-              <Route exact path="/login">
-                <LoginPage />
-              </Route>
               <Route exact path="/dashboard">
                 Dashboard Route
               </Route>
@@ -85,9 +88,6 @@ export default () => {
                 <UserRouter />
               </Route>
             </BodyWrapper>
-            <Route exact path="/">
-              <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
-            </Route>
           </Switch>
         </Router>
       </AuthContext.Provider>
