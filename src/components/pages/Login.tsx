@@ -69,10 +69,10 @@ export default () => {
   }
   console.log(authStatus);
   return (
-    <div className="flex flex-col content-center justify-center h-screen w-screen">
+    <main className="flex flex-col content-center justify-center h-screen w-screen">
       <div className="flex content-center justify-center">
         <LoginForm />
       </div>
-    </div>
+    </main>
   );
 }

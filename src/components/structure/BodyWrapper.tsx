@@ -16,9 +16,9 @@ export const BodyWrapper: React.FunctionComponent<BodyWrapperProps> = (props: Bo
   return (
     <div id="body" className="z-0 left-0 min-h-screen w-screen flex bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
       <Sidebar />
-      <div className="pt-14 w-full sm:w-1/2 md:w-2/3 lg:w-5/6 max-w-screen inline-block">
+      <main className="pt-14 w-full sm:w-1/2 md:w-2/3 lg:w-5/6 max-w-screen inline-block">
         {props.children}
-      </div>
+      </main>
     </div>
   );
 }
