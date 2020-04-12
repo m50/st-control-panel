@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { ReactComponent as CheveronRight } from '../zondicons/cheveron-right.svg';
 
 
 interface Props {
@@ -38,17 +37,22 @@ export default class Breadcrumbs extends React.Component<Props> {
     )
   }
 
-  static Separator: React.FunctionComponent = () => {
-    return <span className="mx-5 font-bold text-lg text-gray-400 dark:text-gray-600"><CheveronRight className="inline fill-current h-5 w-5" /></span>;
+  static Separator: React.FunctionComponent<{ start: boolean }> = ({start}: {start: boolean}) => {
+    return (
+      <span className={(!start ? 'ml-5 ' : '') + "mr-5 font-bold text-lg text-gray-400 dark:text-gray-600"}>
+        /
+      </span>
+    );
   }
 
   render() {
     return (
       <div className="my-3 px-2">
         <div className="bg-gray-200 dark:bg-gray-800 rounded-lg w-full py-1 px-8">
+          <Breadcrumbs.Separator start={true} />
           {React.Children.map(this.props.children, (child, i) => {
             if (i > 0) {
-              return <><Breadcrumbs.Separator />{child}</>
+              return <><Breadcrumbs.Separator start={false} />{child}</>
             }
 
             return child;
