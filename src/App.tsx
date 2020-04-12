@@ -1,7 +1,4 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import { BodyWrapper } from './components/structure/BodyWrapper';
-import LoginPage from './components/pages/Login';
 import { AuthStatus } from './types';
 import config from './configuration.json';
 import { initAuthStatus, AuthContext } from './AuthContext';
@@ -53,19 +50,7 @@ export default () => {
     <div className="bg-white dark:bg-gray-900">
       <AuthContext.Provider value={authContext}>
         <Header />
-        <Router>
-          <Switch>
-            <Route exact path="/login">
-              <LoginPage />
-            </Route>
-            <Route exact path="/">
-              <Redirect to={authStatus.loggedIn ? '/dashboard' : '/login'} />
-            </Route>
-            <BodyWrapper>
-              <AppRouter />
-            </BodyWrapper>
-          </Switch>
-        </Router>
+        <AppRouter />
       </AuthContext.Provider>
     </div>
   );
