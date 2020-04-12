@@ -1,7 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, useContext } from 'react';
 import { useParams, useRouteMatch } from 'react-router';
 import { User } from '../../../spamtitan/User';
-import { api } from '../../../App';
 import { BaseResponseObject, ErrorResponse, ValidationErrors } from '../../../spamtitan/types';
 import { responseIsDataObject, responseIsError } from '../../../spamtitan/API';
 import { Notice, SuccessLevel } from '../../structure/pre-styled/Notice';
@@ -20,7 +19,7 @@ export const UserShow: React.FunctionComponent = () => {
   const [user, setUser] = useState<User | {}>({});
   const [error, setError] = useState<string>('');
   let { url } = useRouteMatch();
-  let { authStatus } = useContext(AuthContext);
+  let { authStatus, api } = useContext(AuthContext);
 
   useEffect(() => {
     if (userId === (authStatus.user as User).id) {
@@ -35,7 +34,7 @@ export const UserShow: React.FunctionComponent = () => {
           }
         });
     }
-  }, [authStatus.user, userId])
+  }, [authStatus.user, userId, api])
 
   return (
     <>
@@ -70,6 +69,7 @@ const NameArea: React.FC<AreaProps> = ({ user }: AreaProps) => {
   const [firstName, setFirstName] = useState(user.first_name);
   const [lastName, setLastName] = useState(user.last_name);
   const [comment, setComment] = useState(user.comment);
+  const { api } = useContext(AuthContext);
 
   useEffect(() => {
     if (isValidationErrors(errors)) {
@@ -98,7 +98,7 @@ const NameArea: React.FC<AreaProps> = ({ user }: AreaProps) => {
           setSuccessLevel(SuccessLevel.success);
           setErrors('Successfully updated the name fields on the user.');
         }
-      }).catch(error => {
+      }).catch((error: any) => {
         if (responseIsError(error)) {
           setErrors(error.error);
           setSuccessLevel(SuccessLevel.error);
@@ -155,6 +155,7 @@ const PasswordArea: React.FC<AreaProps> = (props: AreaProps) => {
   const [toHighlight, setToHighlight] = useState<string[]>([]);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const { api } = useContext(AuthContext);
 
   useEffect(() => {
     if (isValidationErrors(errors)) {
