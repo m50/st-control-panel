@@ -4,6 +4,7 @@ import { ReactComponent as SuccessIcon } from '../../zondicons/checkmark-outline
 import { ReactComponent as NoticeIcon } from '../../zondicons/information-outline.svg';
 import { ReactComponent as WarningIcon } from '../../zondicons/exclamation-outline.svg';
 import { ValidationErrors } from '../../../spamtitan/types';
+import { SVG } from '../../../types';
 
 export enum SuccessLevel {
   error = "border-red-300 text-red-600 bg-red-100",
@@ -12,16 +13,32 @@ export enum SuccessLevel {
   notice = "border-blue-300 text-blue-600 bg-blue-100",
 }
 
+export type NoticeType = string | string[] | ValidationErrors;
+
+function arrayifyNoticeType(notice: NoticeType): string[] {
+  if (isValidationErrors(notice)) {
+    notice = Object.values(notice).flat();
+  } else if (typeof notice === 'string') {
+    notice = [notice];
+  }
+
+  return notice;
+}
+
+export function isValidationErrors(notices: NoticeType): notices is ValidationErrors {
+  return !Array.isArray(notices) && typeof notices !== 'string';
+}
+
+export function appendNotice(notices: NoticeType, newNotice: NoticeType): NoticeType {
+  const firstNotices = arrayifyNoticeType(notices);
+
+  return firstNotices.concat(arrayifyNoticeType(newNotice));
+}
+
 interface Props {
-  errors: string | string[] | ValidationErrors,
+  errors: NoticeType,
   successLevel?: SuccessLevel
 }
-
-export function isValidationErrors(errors: string | string[] | ValidationErrors): errors is ValidationErrors {
-  return !Array.isArray(errors) && typeof errors !== 'string';
-}
-
-type SVG = React.FC<React.SVGProps<SVGSVGElement> & { title?: string | undefined; }>;
 
 export const Notice: React.FC<Props> = (props: Props) => {
   const [noticeIcon, setNoticeIcon] = useState<SVG>(ErrorIcon);
@@ -40,17 +57,13 @@ export const Notice: React.FC<Props> = (props: Props) => {
   }, [props.successLevel]);
 
   useEffect(() => {
-    let errArray: string[] = [];
-    if (isValidationErrors(props.errors)) {
-      errArray = Object.values(props.errors).flat();
-    } else if (typeof props.errors === 'string') {
-      errArray = [props.errors];
-    } else {
-      errArray = props.errors;
-    }
-    setErrors(errArray.filter((err) => err.length > 0).map((err) => {
-      return { icon: noticeIcon, error: err };
-    }));
+    let errArray: string[] = arrayifyNoticeType(props.errors);
+    setErrors(
+      errArray
+        .filter(err => err.length > 0)
+        .filter((item, idx) => errArray.indexOf(item) === idx)
+        .map(err => ({ icon: noticeIcon, error: err }))
+    );
   }, [props.errors, noticeIcon]);
 
   return (
