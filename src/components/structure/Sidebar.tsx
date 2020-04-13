@@ -16,9 +16,9 @@ const shrunkenString = '';
 const linkData: LinkData[] = [
   { to: '/dashboard', icon: dashboardIcon, title: 'Dashboard' },
   { to: '/system', icon: systemIcon, title: 'System' },
+  { to: '/domain-groups', icon: domainGroupIcon, title: 'Domain Groups' },
   { to: '/domains', icon: domainIcon, title: 'Domains' },
   { to: '/users', icon: userIcon, title: 'Users' },
-  { to: '/domain-groups', icon: domainGroupIcon, title: 'Domain Groups' },
   { to: '/reporting', icon: reportingIcon, title: 'Reporting' },
   { to: '/quarantine', icon: quarantineIcon, title: 'Quarantine' },
   { to: '/history', icon: historyIcon, title: 'History' },
