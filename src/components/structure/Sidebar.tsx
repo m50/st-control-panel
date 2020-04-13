@@ -35,8 +35,11 @@ const expandedWidth: string = "sm:w-1/2 md:w-1/3 xl:w-1/6";
 const shrunkenClassName: string = `-translate-x-full truncate ${shrunkenWidth}`;
 const expandedClassName: string = `translate-x-0 ${expandedWidth}`;
 
+interface Props {
+  expandCB: CallableFunction
+}
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<Props> = ({ expandCB }: Props) => {
   const [open, setOpen] = useState(true);
   const [expandButtonText, setExpandButtonText] = useState('');
 
@@ -48,6 +51,8 @@ export const Sidebar: React.FC = () => {
     setOpen(sidebarStatus.open);
     setExpandButtonText(sidebarStatus.expandButtonText);
   }, []);
+
+  useEffect(() => expandCB(open), [open, expandCB]);
 
   useEffect(() => localStorage.setItem('sidebar-status', JSON.stringify({ open, expandButtonText })), [open, expandButtonText]);
 
