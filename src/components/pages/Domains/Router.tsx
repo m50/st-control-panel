@@ -4,7 +4,7 @@ import Container from '../../structure/Container';
 import { DomainList } from './List';
 
 
-export const UserRouter: React.FC = () => {
+export const DomainRouter: React.FC = () => {
   let { path } = useRouteMatch();
 
   return (
