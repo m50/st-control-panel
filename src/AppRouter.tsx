@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-d
 import { BodyWrapper } from './components/structure/BodyWrapper';
 import LoginPage from './components/pages/Login';
 import { AuthContext } from './AuthContext';
+import { DomainRouter } from './components/pages/Domains/Router';
 
 export const AppRouter: React.FC = () => {
   const { authStatus } = useContext(AuthContext);
@@ -27,6 +28,9 @@ export const AppRouter: React.FC = () => {
           </Route>
           <Route path="/users">
             <UserRouter />
+          </Route>
+          <Route path="/domains">
+            <DomainRouter />
           </Route>
         </BodyWrapper>
       </Switch>
